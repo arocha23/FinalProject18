@@ -37,6 +37,9 @@ def startButton(x, y, width, height, old_color, new_color):
         pygame.draw.rect(game_screen, new_color, (x, y , width, height))
         if click != None and click[0] == 1:
             print("hi")
+            game_screen.fill(white)
+            pygame.display.update()
+            clock.tick(15)
     else:
         pygame.draw.rect(game_screen, old_color,(x, y, width, height))
 
