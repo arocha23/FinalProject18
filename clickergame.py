@@ -15,6 +15,8 @@ clock = pygame.time.Clock()
 max_fps = 60
 background_image = pygame.image.load("lightbluebg.jpg")
 background_image = pygame.transform.scale(background_image, (1000, 500))
+button_text = pygame.font.Font("Quicksand-Regular.ttf", 15)
+increment = 1/15
 
 image_one = pygame.image.load("animeprgm.png")
 image_two = pygame.image.load("motivation.png")
@@ -38,46 +40,10 @@ class Player:
     def get_score(self):
         return(str(round(self.player_attributes['score'])))
 
-    def inc_score_tick(self):
-        self.player_attributes['score'] += 1/15
-        return(self.player_attributes['score'])
-
-    def inc_score_click(self):
-        self.player_attributes['score'] += 1
-        return(self.player_attributes['score'])
-
-    def dec_score(self):
-        self.player_attributes['score'] -= 1
-        return(self.player_attributes['score'])
-
-class Upgrade1(Player):
-    """First button upgrade"""
-    def __init__(self):
-        Player.__init__(self)
-    
-    def inc_score(self):
-        self.player_attributes['score'] += 9
-        return(self.player_attributes['score']) 
-
-class Upgrade2(Player):
-    """Second button upgrade"""
-    def __init__(self):
-        Player.__init__(self)
-    
-
 def txt_obj(text, font):
     """Creates object for text to be created on"""
     Text_Surface = font.render(text, True, black)
     return Text_Surface, Text_Surface.get_rect()
-
-# def display_messages(text, xr, yr):
-#     cool_titletext = pygame.Font.font('Quicksand-Regular.ttf', 50)
-#     txt_surface, txt_rect = txt_obj(text, cool_titletext)
-#     txt_rect.center = (display_width*xr, display_height*yr)
-#     game_screen.blit(txt_surface, txt_rect)
-#     pygame.display.update()
-
-
 
 def startButton(x, y, width, height, old_color, new_color):
     """Used for the start button, enters the game"""
@@ -106,16 +72,50 @@ class Button(pygame.Rect):
             if click != None and click[0] == 1:
                 self.player_object.inc_score_click()
                 print("Clicks of Productivity: ", self.player_object.get_score())
-                pygame.display.update()
-                clock.tick(max_fps)
+                return True
         else:
             pygame.draw.rect(game_screen, self.old_color, (self.x, self.y, self.width, self.height))
-        
-        button_text = pygame.font.Font("Quicksand-Regular.ttf", 15)
+            return False
         txt_surface, txt_rect = txt_obj(self.message, button_text)
         txt_rect.center = ((self.x + (self.width/2)), (self.y + (self.height/2)))
         game_screen.blit(txt_surface, txt_rect)
 
+class Clicker(Player):
+    """Clicker button"""
+    def __init__(self):
+        self.growth_value = 1/15
+        Player.__init__(self)
+    
+    def inc_score_click(self):
+        self.player_attributes['score'] += 1 
+        return(self.player_attributes['score'])
+    
+    def inc_score_tick(self):
+        self.player_attributes['score'] += self.growth_value
+        return(self.player_attributes['score'])
+
+    def upgrade(self):
+        self.growth_value += 2/15
+
+
+class Upgrade1(Player):
+    """First button upgrade"""
+    def __init__(self):
+        Player.__init__(self)
+        self.growth_value = 3/15
+    
+    def inc_score_click(self):
+        self.player_attributes['score'] += 10
+        return(self.player_attributes['score']) 
+
+    def inc_score_tick(self):
+        self.player_attributes['score'] += self.growth_value
+        return(self.player_attributes['score'])
+    
+class Upgrade2(Player):
+    """Second button upgrade"""
+    def __init__(self):
+        Player.__init__(self)
 
 
 
@@ -162,8 +162,8 @@ def game_intro():
 
 def start_game():
     """Running game, WIP"""
-    initial_button = Player()
-    button1 = Upgrade1()
+    clicker1 = Clicker()
+    clicker2 = Clicker()
     game = True
     while game:
         for event in pygame.event.get():
@@ -174,20 +174,21 @@ def start_game():
         
         game_screen.blit(background_image, [0, 0])
                 
-        button_text = pygame.font.Font("Quicksand-Regular.ttf", 15)
-        prod_button = Button(200, 300, 250, 50, "Click to increase productivity!", cool_blue, cooler_blue, initial_button)
-        upgrade1 = Button(300, 400, 250, 50, "Buy something", cool_blue, cooler_blue, button1)
+        prod_button = Button(200, 300, 250, 50, "Click to increase productivity!", cool_blue, cooler_blue, clicker1)
+        upgrade1 = Button(300, 400, 250, 50, "Buy something", cool_blue, cooler_blue, clicker2)
         prod_button.clicked()
-        upgrade1.clicked()
-        txt_surface, txt_rect = txt_obj("Clicks of Productivity: " + initial_button.get_score(), button_text)
+        txt_surface, txt_rect = txt_obj("Clicks of Productivity: " + clicker1.get_score(), button_text)
         txt_rect.center = ((200+(250/2)), (225+(50/2)))
         game_screen.blit(txt_surface, txt_rect)
-        initial_button.inc_score_tick() 
+        clicker1.inc_score_tick()
+        if upgrade1.clicked():
+            clicker1.upgrade()
         pygame.display.update()
         clock.tick(15)
         
 game_intro()
 start_game()
 pygame.quit()
+
 
 # Seize the means of production
