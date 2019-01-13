@@ -7,6 +7,8 @@ white = (255, 255, 255)
 cool_blue = (30, 144, 255)
 cooler_blue = (30, 175, 255)
 gray = (211, 211, 211)
+crimson = (220, 20, 60)
+limegreen = (50, 205, 50)
 display_width = 1000
 display_height = 500
 
@@ -16,8 +18,11 @@ pygame.display.set_caption('Clicker')
 clock = pygame.time.Clock()
 max_fps = 60
 background_image = pygame.image.load("lightbluebg.jpg")
-background_image = pygame.transform.scale(background_image, (1000, 500))
+background_image = pygame.transform.scale(background_image, (display_width, display_height))
+instructions_background = pygame.image.load("yellow-background-3.jpg")
+instructions_background = pygame.transform.scale(instructions_background, (display_width, display_height))
 button_text = pygame.font.Font("Quicksand-Regular.ttf", 15)
+bigger_button_text = pygame.font.Font("Quicksand-Regular.ttf", 20)
 cool_titletext = pygame.font.Font("Quicksand-Regular.ttf", 50)
 
 
@@ -93,6 +98,7 @@ class Clicker(Player):
     def __init__(self):
         self.growth_value = 1/15
         self.dec_value = 5
+        self.multiplier = 2
         Player.__init__(self)
     
     def inc_score_click(self):
@@ -103,8 +109,15 @@ class Clicker(Player):
         self.player_attributes['score'] += self.growth_value
         return(self.player_attributes['score'])
     
+    def get_pps(self):
+        return(str(round(self.growth_value * 15, 3)))
+    
     def dec_score1(self):
         self.player_attributes['score'] -= self.dec_value
+        return(self.player_attributes['score'])
+    
+    def dec_score1_5(self):
+        self.player_attributes['score'] -= self.dec_value * 23/5
         return(self.player_attributes['score'])
     
     def dec_score2(self):
@@ -112,22 +125,32 @@ class Clicker(Player):
         return(self.player_attributes['score'])
 
     def dec_score3(self):
-        self.player_attributes['score'] -= self.dec_value * 100
+        self.player_attributes['score'] -= self.dec_value * 50
         return(self.player_attributes['score'])
 
+    def dec_score4(self):
+        self.player_attributes['score'] -= self.dec_value * 100
+        return(self.player_attributes['score'])
+    
+    def dec_score5(self):
+        self.player_attributes['score'] -= self.dec_value * 150
+        return(self.player_attributes['score'])
+    
+    def dec_score6(self):
+        self.player_attributes['score'] -= self.dec_value * 300
+        return(self.player_attributes['score'])
+    
     def upgrade_inc1(self):
-        self.growth_value += 2/15
+        self.growth_value *= self.multiplier
     
     def upgrade_inc2(self):
-        self.growth_value += 5/15
+        self.growth_value *= (self.multiplier * 2)
 
     def upgrade_inc3(self):
-        self.growth_value += 1
+        self.growth_value *= (self.multiplier * 4)
 
 
-
-
-
+clicker = Clicker()
 
 def game_intro():
     """Main menu screen"""
@@ -164,103 +187,262 @@ def game_intro():
         pygame.display.update()
         clock.tick(max_fps)
 
+def return_instructions1():
+    """Blits instructions pt.1"""
+    txt_surface, txt_rect = txt_obj("You have midterms soon, but you aren't being too productive.", bigger_button_text)
+    txt_rect.center = ((display_width/2), (display_height/2))
+    game_screen.blit(txt_surface, txt_rect)
+
+def return_instructions2():
+    """Blits instructions pt.2"""
+    txt_surface, txt_rect = txt_obj("All you gotta do is click to get more productivity.", bigger_button_text)
+    txt_rect.center = ((display_width/2), ((display_height/2) + 100))
+    game_screen.blit(txt_surface, txt_rect)
+
+def instructions():
+    """Instructions page"""
+    done = False
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+                pygame.quit()
+                quit()
+        
+        game_screen.blit(instructions_background, [0, 0])
+        txt_surface, txt_rect = txt_obj("Instructions", cool_titletext)
+        txt_rect.center = ((display_width/2), (display_height/2 - 100))
+        game_screen.blit(txt_surface, txt_rect)
+        return_instructions1()
+        return_instructions2()
+        ok_button = Button(375, 400, 250, 50, "Let's get this bread.", limegreen, limegreen, clicker)
+        ok_button.draw(game_screen)
+        if ok_button.clicked():
+            done = True
+        pygame.display.update()
+        clock.tick(max_fps)
 
 
-clicker1 = Clicker()
-clicker2 = Clicker()
-clicker3 = Clicker()
-clicker4 = Clicker()
-prod_button = Button(200, 300, 250, 50, "Click to increase productivity!", cool_blue, cooler_blue, clicker1)
-upgrade1 = Button(500, 100, 250, 50, "Buy a helpful colleague: 5 Prod.", gray, cooler_blue, clicker2)
-upgrade2 = Button(500, 200, 300, 50, "Buy the smartest kid in the grade: 100 Prod.", gray, cooler_blue, clicker3)
-upgrade3 = Button(500, 300, 250, 50, "Buy Slader: 500 Prod.", gray, cooler_blue, clicker4)
+prod_button = Button(200, 300, 250, 50, "Click to increase productivity!", cool_blue, cooler_blue, clicker)
+upgrade1 = Button(500, 100, 250, 50, "Buy a helpful colleague: 5 Prod.", gray, cooler_blue, clicker)
+upgrade1_5 = Button(500, 100, 450, 50, "Buy the unintelligent creator of this game: 23 Prod.", gray, cooler_blue, clicker)
+upgrade2 = Button(500, 200, 350, 50, "Buy the smartest kid in the grade: 100 Prod.", gray, cooler_blue, clicker)
+upgrade3 = Button(500, 300, 250, 50, "Buy Slader: 250 Prod.", gray, cooler_blue, clicker)
+upgrade4 = Button(500, 400, 400, 50, "Buy Shia LaBeouf inspiration DVD: 500 Prod.", gray, cooler_blue, clicker)
+upgrade5 = Button(500, 100, 250, 50, "Buy a teacher: 750 Prod.", gray, cooler_blue, clicker)
+upgrade6 = Button(500, 200, 250, 50, "Buy teacher's entire lesson plans: 1500 Prod.", gray, cooler_blue, clicker)
+
+def return_clicks():
+    txt_surface, txt_rect = txt_obj("Clicks of Productivity: " + clicker.get_score(), button_text)
+    txt_rect.center = ((200+(250/2)), (225+(50/2)))
+    game_screen.blit(txt_surface, txt_rect)
+
+def return_pps():
+    txt_surface, txt_rect = txt_obj("Productivity per Second: " + clicker.get_pps(), button_text)
+    txt_rect.center = ((200 + (250/2), (175 + (50/2))))
+    game_screen.blit(txt_surface, txt_rect)
 
 def start_game():
     """Running game, WIP"""
 
-    loop1 = True
-    while loop1:
+    loop = True
+    while loop:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                game1 = False
+                loop = False
                 pygame.quit()
                 quit()
                 
         game_screen.blit(background_image, [0, 0])
                 
         prod_button.clicked()
-        txt_surface, txt_rect = txt_obj("Clicks of Productivity: " + clicker1.get_score(), button_text)
-        txt_rect.center = ((200+(250/2)), (225+(50/2)))
-        game_screen.blit(txt_surface, txt_rect)
-        clicker1.inc_score_tick()
+        return_clicks()
+        return_pps()
+        clicker.inc_score_tick()
         prod_button.draw(game_screen)
         upgrade1.draw(game_screen)
-        if int(clicker1.get_score()) >= 5:
+        if int(clicker.get_score()) >= 5:
             upgrade1.clicked()
             if upgrade1.clicked():
-                clicker1.upgrade_inc1()
-                clicker1.dec_score1()
-                loop1 = False
+                clicker.upgrade_inc1()
+                clicker.dec_score1()
+                loop = False
         pygame.display.update()
         clock.tick(15)
         
 def part_2():
     """After upgrade1 is clicked"""
-    loop2 = True
-    while loop2:
+    loop = True
+    while loop:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                loop2 = False
+                loop = False
                 pygame.quit()
                 quit()
         
         game_screen.blit(background_image, [0, 0])
         prod_button.clicked()
-        txt_surface, txt_rect = txt_obj("Clicks of Productivity: " + clicker1.get_score(), button_text)
-        txt_rect.center = ((200+(250/2)), (225+(50/2)))
-        game_screen.blit(txt_surface, txt_rect)
-        clicker1.inc_score_tick()
-        if int(clicker1.get_score()) >= 100:
-            upgrade1.clicked()
+        return_clicks()
+        return_pps()
+        clicker.inc_score_tick()
+        if int(clicker.get_score()) >= 23:
+            upgrade1_5.clicked()
+            if upgrade1_5.clicked():
+                clicker.upgrade_inc1()
+                clicker.dec_score1_5() 
+                loop = False
+        elif int(clicker.get_score()) >= 100:
+            upgrade2.clicked()
             if upgrade2.clicked():
-                clicker1.upgrade_inc2()
-                clicker1.dec_score2() 
-                loop2 = False
+                clicker.upgrade_inc1()
+                clicker.dec_score2()
+                loop = False
         prod_button.draw(game_screen)
+        upgrade1_5.draw(game_screen)
         upgrade2.draw(game_screen)
         pygame.display.update()
         clock.tick(15)
 
 def part_3():
-    """After upgrade2 is clicked"""
-    loop3 = True
-    while loop3:
+    """After upgrade1_5 or 2 is clicked"""
+    loop = True
+    while loop:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                loop3 = False
+                loop = False
                 pygame.quit()
                 quit()
         
         game_screen.blit(background_image, [0, 0])
         prod_button.clicked()
-        txt_surface, txt_rect = txt_obj("Clicks of Productivity: " + clicker1.get_score(), button_text)
-        txt_rect.center = ((200+(250/2)), (225+(50/2)))
-        game_screen.blit(txt_surface, txt_rect)
-        clicker1.inc_score_tick()
-        if int(clicker1.get_score()) >= 500:
+        return_clicks()
+        return_pps()
+        clicker.inc_score_tick()
+        if int(clicker.get_score()) >= 100:
+            upgrade2.clicked()
+            if upgrade2.clicked():
+                clicker.upgrade_inc1()
+                clicker.dec_score2()
+                loop = False
+        elif int(clicker.get_score()) >= 250:
             upgrade3.clicked()
             if upgrade3.clicked():
-                clicker1.upgrade_inc3()
-                clicker1.dec_score3()
+                clicker.upgrade_inc1()
+                clicker.dec_score3()
+                loop = False
         prod_button.draw(game_screen)
+        upgrade2.draw(game_screen)
         upgrade3.draw(game_screen)
         pygame.display.update()
         clock.tick(15)
 
+def part_4():
+    """After upgrade2 or 3 is clicked"""
+    loop = True
+    while loop:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                loop = False
+                pygame.quit()
+                quit()
+        
+        game_screen.blit(background_image, [0, 0])
+        prod_button.clicked()
+        return_clicks()
+        return_pps()
+        clicker.inc_score_tick()
+        if int(clicker.get_score()) >= 250:
+            upgrade3.clicked()
+            if upgrade3.clicked():
+                clicker.upgrade_inc1()
+                clicker.dec_score3()
+                loop = False
+        elif int(clicker.get_score()) >= 500:
+            upgrade4.clicked()
+            if upgrade4.clicked():
+                clicker.upgrade_inc2()
+                clicker.dec_score4()
+                loop = False
+        prod_button.draw(game_screen)
+        upgrade3.draw(game_screen)
+        upgrade4.draw(game_screen)
+        pygame.display.update()
+        clock.tick(15)
+
+def part_5():
+    """After upgrade3 or 4 is clicked"""
+    loop = True
+    while loop:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                loop = False
+                pygame.quit()
+                quit()
+        
+        game_screen.blit(background_image, [0, 0])
+        prod_button.clicked()
+        return_clicks()
+        return_pps()
+        clicker.inc_score_tick()
+        if int(clicker.get_score()) >= 500:
+            upgrade4.clicked()
+            if upgrade4.clicked():
+                clicker.upgrade_inc2()
+                clicker.dec_score4()
+                loop = False
+        elif int(clicker.get_score()) >= 750:
+            upgrade5.clicked()
+            if upgrade5.clicked():
+                clicker.upgrade_inc1()
+                clicker.dec_score5()
+                loop = False
+        prod_button.draw(game_screen)
+        upgrade4.draw(game_screen)
+        upgrade5.draw(game_screen)
+        pygame.display.update()
+        clock.tick(15)
+
+def part_6():
+    """After upgrade4 is clicked"""
+    loop = True
+    while loop:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                loop = False
+                pygame.quit()
+                quit()
+        
+        game_screen.blit(background_image, [0, 0])
+        prod_button.clicked()
+        return_clicks()
+        return_pps()
+        clicker.inc_score_tick()
+        if int(clicker.get_score()) >= 750:
+            upgrade5.clicked()
+            if upgrade5.clicked():
+                clicker.upgrade_inc1()
+                clicker.dec_score5()
+                loop = False
+        elif int(clicker.get_score()) >= 1500:
+            upgrade6.clicked()
+            if upgrade6.clicked():
+                clicker.upgrade_inc1()
+                clicker.dec_score6()
+                loop = False
+        prod_button.draw(game_screen)
+        upgrade5.draw(game_screen)
+        upgrade6.draw(game_screen)
+        pygame.display.update()
+        clock.tick(15)
+
 game_intro()
+instructions()
 start_game()
 part_2()
 part_3()
+part_4()
+part_5()
+part_6()
 pygame.quit()
 
 
