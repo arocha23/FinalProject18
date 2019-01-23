@@ -20,6 +20,8 @@ clock = pygame.time.Clock()
 max_fps = 15
 background_image = pygame.image.load("Images/lightbluebg.jpg")
 background_image = pygame.transform.scale(background_image, (display_width, display_height))
+red_background = pygame.image.load("Images/red_background.png")
+red_background = pygame.transform.scale(red_background, (display_width, display_height))
 instructions_background = pygame.image.load("Images/yellow-background-3.jpg")
 instructions_background = pygame.transform.scale(instructions_background, (display_width, display_height))
 button_text = pygame.font.Font("Quicksand-Regular.ttf", 15)
@@ -27,15 +29,16 @@ bigger_button_text = pygame.font.Font("Quicksand-Regular.ttf", 20)
 cool_titletext = pygame.font.Font("Quicksand-Regular.ttf", 50)
 file_path = 'gamemusic.wav'
 file_wav = wave.open(file_path)
-frequency = file_wav.getframerate()
-pygame.mixer.init(frequency=frequency)
+frequency = file_wav.getframerate() 
+pygame.mixer.init(frequency=frequency) # Match frequency of the .wav file
 
 
-
+# Images/Sprites
 image_one = pygame.image.load("Images/animeprgm.png")
 image_one = pygame.transform.smoothscale(image_one, (200, 200))
 person_img = pygame.image.load("Images/blueperson.png").convert_alpha()
 communistpic = pygame.image.load("Images/communistguy.png").convert_alpha()
+
 
 
 class Player:
@@ -47,6 +50,7 @@ class Player:
         self.player_attributes['score'] = 0
 
     def get_score(self):
+        """Return the integer score value"""
         return(str(round(self.player_attributes['score'])))
 
 def txt_obj(text, font):
@@ -81,6 +85,7 @@ class Button(pygame.Rect):
         self.player_object = player_object
     
     def clicked(self):
+        """If button is hovered over, highlight it. If button is clicked, increase productivity score"""
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
@@ -96,6 +101,7 @@ class Button(pygame.Rect):
             return False
 
     def draw(self, screen):
+        """Draw button"""
         pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
         txt_surface, txt_rect = txt_obj(self.message, button_text)
         txt_rect.center = ((self.x + (self.width/2)), (self.y + (self.height/2)))
@@ -103,7 +109,7 @@ class Button(pygame.Rect):
     
 
 class Clicker(Player):
-    """Clicker button"""
+    """Clicker button object"""
     def __init__(self):
         self.growth_value = 1/15
         self.dec_value = 5
@@ -111,17 +117,21 @@ class Clicker(Player):
         Player.__init__(self)
     
     def inc_score_click(self):
+        """Increase productivity score if button is clicked"""
         self.player_attributes['score'] += 1 
         return(self.player_attributes['score'])
     
     def inc_score_tick(self):
+        """Increase growth value per time, which increases productivity score"""
         self.player_attributes['score'] += self.growth_value
         return(self.player_attributes['score'])
     
     def get_pps(self):
+        """Return productivity per second"""
         return(str(round(self.growth_value * 15, 3)))
     
     def dec_score1(self):
+        """Decrease score by certain value"""
         self.player_attributes['score'] -= self.dec_value
         return(self.player_attributes['score'])
     
@@ -162,6 +172,7 @@ class Clicker(Player):
         self.player_attributes['score'] -= self.dec_value * 200000
     
     def upgrade_inc1(self):
+        """Increase productivity per second by a certain multiplier"""
         self.growth_value *= self.multiplier
     
     def upgrade_inc2(self):
@@ -171,9 +182,9 @@ class Clicker(Player):
         self.growth_value *= (self.multiplier * 4)
 
 
-clicker = Clicker()
+clicker = Clicker() # Define clicker object
 pygame.mixer.music.load("gamemusic.wav")
-pygame.mixer.music.play(-1)
+pygame.mixer.music.play(-1) # Loop game music
 def game_intro():
     """Main menu screen"""
     done = False
@@ -681,23 +692,15 @@ def seize():
         pygame.display.update()
         clock.tick(max_fps)
 
-def final_scene():
-    """Played after seize of production button is clicked"""
-    game_screen.fill(white)
-    red_guy.draw()
-    blueperson.draw()
-    display_message("You are met with a communist", 250, 50)
-    display_message("He gives you the Seize tool and allows you to seize the means of production", 250, 75)
-    display_message("Press SPACEBAR to continue", 250, 125)
-    pygame.display.update()
 
 def end_game():
-    """Played after spacebar is clicked, final scene"""
-    game_screen.fill(white)
+    """Played after 'seize the means of production' button is clicked, final scene"""
+    game_screen.blit(red_background, (0,0))
     red_guy.draw()
     blueperson.draw()
     display_message("You have successfully seized the means of production.", 250, 50)
-    display_message("You win!", 250, 100)
+    time.sleep(2)
+    display_message("You win!", 400, 100)
     pygame.display.update()
     clock.tick(max_fps)
 
@@ -719,25 +722,9 @@ part_9()
 part_10()
 part_11()
 seize()
-variable_count = 0
-final = False
-while not final:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-            final = True
-    key = pygame.key.get_pressed()
-    if key[pygame.K_SPACE]:
-        variable_count += 1
-    if variable_count == 0:
-        final_scene()
-    if variable_count == 1:
-        end_game()
-        time.sleep(2)
-        final = True
-    clock.tick(max_fps)
+end_game()
+time.sleep(4)
+pygame.mixer.music.fadeout(1000)
 fade_out()
-pygame.mixer.music.fadeout(500)
 pygame.quit()
 quit()
