@@ -17,10 +17,10 @@ pygame.init()
 game_screen = pygame.display.set_mode([display_width, display_height])
 pygame.display.set_caption('Clicker')
 clock = pygame.time.Clock()
-max_fps = 60
-background_image = pygame.image.load("lightbluebg.jpg")
+max_fps = 15
+background_image = pygame.image.load("Images/lightbluebg.jpg")
 background_image = pygame.transform.scale(background_image, (display_width, display_height))
-instructions_background = pygame.image.load("yellow-background-3.jpg")
+instructions_background = pygame.image.load("Images/yellow-background-3.jpg")
 instructions_background = pygame.transform.scale(instructions_background, (display_width, display_height))
 button_text = pygame.font.Font("Quicksand-Regular.ttf", 15)
 bigger_button_text = pygame.font.Font("Quicksand-Regular.ttf", 20)
@@ -31,17 +31,12 @@ frequency = file_wav.getframerate()
 pygame.mixer.init(frequency=frequency)
 
 
-image_one = pygame.image.load("animeprgm.png")
+
+image_one = pygame.image.load("Images/animeprgm.png")
 image_one = pygame.transform.smoothscale(image_one, (200, 200))
-image_two = pygame.image.load("motivation.png")
-image_three = pygame.image.load("productivity.png")
+person_img = pygame.image.load("Images/blueperson.png").convert_alpha()
+communistpic = pygame.image.load("Images/communistguy.png").convert_alpha()
 
-image_list = [image_one, image_two, image_three]
-x_ = random.randint(0, 800)
-y_ = random.randint(0, 400)
-
-display_rdmImg = random.choice(image_list)
-display_rdmImg = pygame.transform.scale(display_rdmImg, (70, 80))
 
 class Player:
     """Return a new person object"""
@@ -60,6 +55,7 @@ def txt_obj(text, font):
     return Text_Surface, Text_Surface.get_rect()
 
 def display_message(text, x, y):
+    """Display messages at a certain x, y center"""
     txt_surface, txt_rect = txt_obj(text, button_text)
     txt_rect.center = (x, y)
     game_screen.blit(txt_surface, txt_rect.center)
@@ -254,7 +250,33 @@ def instructions():
         pygame.display.update()
         clock.tick(max_fps)
 
+class People(pygame.sprite.Sprite):
+    """Basic person sprite"""
+    def __init__(self):
+        super().__init__()
+        self.image = person_img
+       
+    def draw(self):
+        """Draw sprite"""
+        game_screen.blit(self.image, (25, 100))
+        pygame.display.update()
+        clock.tick(10)
 
+
+class Communist(pygame.sprite.Sprite):
+    """Communist sprite"""
+    def __init__(self):
+        super().__init__()
+        self.image = communistpic
+
+    def draw(self):
+        """Draw sprite"""
+        game_screen.blit(self.image, (425, -50))
+        pygame.display.update()
+        clock.tick(10)
+
+
+# Main button and object calls
 prod_button = Button(200, 300, 250, 50, "Click to increase productivity!", cool_blue, cooler_blue, clicker)
 upgrade1 = Button(500, 100, 250, 50, "Buy a helpful colleague: 5 Prod.", gray, cooler_blue, clicker)
 upgrade1_5 = Button(500, 100, 450, 50, "Buy the unintelligent creator of this game: 23 Prod.", gray, cooler_blue, clicker)
@@ -269,18 +291,23 @@ upgrade8 = Button(500, 400, 400, 50, "Buy the board of education: 20000 Prod.", 
 upgrade9 = Button(500, 250, 300, 50, "Buy the United States: 150000 Prod.", gray, cooler_blue, clicker)
 upgrade10 = Button(500, 200, 350, 50, "Buy the entire world: 1000000 Prod.", gray, cooler_blue, clicker)
 seize_button = Button(500, 250, 350, 50, "Seize the means of production...", gray, crimson, clicker)
+blueperson = People()
+red_guy = Communist()
 
 def return_clicks():
+    """Return clicks of productivity as text"""
     txt_surface, txt_rect = txt_obj("Clicks of Productivity: " + clicker.get_score(), button_text)
     txt_rect.center = ((200+(250/2)), (225+(50/2)))
     game_screen.blit(txt_surface, txt_rect)
 
 def return_pps():
+    """Return productivity per second as text"""
     txt_surface, txt_rect = txt_obj("Productivity per Second: " + clicker.get_pps(), button_text)
     txt_rect.center = ((200 + (250/2), (175 + (50/2))))
     game_screen.blit(txt_surface, txt_rect)
 
 def fade_out():
+    """Fade screen out to black"""
     fade = pygame.Surface((display_width, display_height))
     fade.fill((0, 0, 0))
     for i in range (0, 255):
@@ -289,30 +316,9 @@ def fade_out():
         pygame.display.update()
         pygame.time.delay(5)
 
-def fade_in():
-    fade = pygame.Surface((display_width, display_height))
-    fade.fill((255, 255, 255))
-    for i in range (0, 255):
-        fade.set_alpha(255-i)
-        game_screen.blit(fade, [0, 0])
-        pygame.display.update()
-        pygame.time.delay(5)
-
-def text_animation(string, font):
-    text = ' '
-    for i in range(len(string)):
-        game_screen.fill(white)
-        text += string[i]
-        txt_surface = font 
-        txt_rect = txt_surface.get_rect()
-        txt_rect.center = ((display_width/2, display_height/2))
-        game_screen.blit(txt_surface, txt_rect)
-        pygame.display.update()
-        pygame.time.wait(50)
 
 def start_game():
-    """Running game, WIP"""
-
+    """Beginning of game"""
     loop = True
     while loop:
         for event in pygame.event.get():
@@ -338,7 +344,7 @@ def start_game():
                 clicker.dec_score1()
                 loop = False
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
         
 def part_2():
     """After upgrade1 is clicked"""
@@ -373,10 +379,10 @@ def part_2():
         upgrade1_5.draw(game_screen)
         upgrade2.draw(game_screen)
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
 
 def part_2_5():
-    """After upgrade2 is clicked"""
+    """After upgrade2 is clicked but not upgrade1_5"""
     loop = True
     while loop:
         for event in pygame.event.get():
@@ -401,11 +407,11 @@ def part_2_5():
         prod_button.draw(game_screen)
         upgrade1_5.draw(game_screen)
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
 
 
 def part_3():
-    """After upgrade1_5 or 2 is clicked"""
+    """After upgrade1_5 is clicked but not upgrade2"""
     loop = True
     while loop:
         for event in pygame.event.get():
@@ -429,10 +435,10 @@ def part_3():
         prod_button.draw(game_screen)
         upgrade2.draw(game_screen)
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
 
 def part_4():
-    """After upgrade2 or 3 is clicked"""
+    """After upgrade2 is clicked"""
     loop = True
     while loop:
         for event in pygame.event.get():
@@ -456,10 +462,10 @@ def part_4():
         prod_button.draw(game_screen)
         upgrade3.draw(game_screen)
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
 
 def part_5():
-    """After upgrade3 or 4 is clicked"""
+    """After upgrade3 is clicked"""
     loop = True
     while loop:
         for event in pygame.event.get():
@@ -483,7 +489,7 @@ def part_5():
         prod_button.draw(game_screen)
         upgrade4.draw(game_screen)
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
 
 def part_6():
     """After upgrade4 is clicked"""
@@ -510,9 +516,10 @@ def part_6():
         prod_button.draw(game_screen)
         upgrade5.draw(game_screen)
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
 
 def part_7():
+    """After upgrade5 is clicked"""
     loop = True
     while loop:
         for event in pygame.event.get():
@@ -536,33 +543,11 @@ def part_7():
         prod_button.draw(game_screen)
         upgrade6.draw(game_screen)
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
 
-# def doze():
-#     loop = True
-#     while loop:
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 loop = False
-#                 pygame.quit()
-#                 quit()
-        
-#         game_screen.blit(background_image, [0, 0])
-#         prod_button.clicked()
-#         return_clicks()
-#         return_pps()
-#         clicker.inc_score_tick()
-#         prod_button.draw(game_screen)
-#         doze_button.clicked()
-#         if doze_button.clicked():
-#             pygame.mixer.music.fadeout(2000)
-#             fade_out()
-#             loop = False
-#         doze_button.draw(game_screen)
-#         pygame.display.update()
-#         clock.tick(15)
 
 def part_8():
+    """After upgrade6 is clicked"""
     loop = True
     while loop:
         for event in pygame.event.get():
@@ -586,9 +571,10 @@ def part_8():
         display_message("You bought the teacher's lesson plans! Productivity x2", 100, 400)
         upgrade7.draw(game_screen)
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
 
 def part_9():
+    """After upgrade7 is clicked"""
     loop = True
     while loop:
         for event in pygame.event.get():
@@ -613,9 +599,10 @@ def part_9():
         display_message("You bought the principal! Productivity x4", 100, 400)
         upgrade8.draw(game_screen)
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
 
 def part_10():
+    """After upgrade8 is clicked"""
     loop = True
     while loop:
         for event in pygame.event.get():
@@ -640,9 +627,10 @@ def part_10():
         display_message("You bought the board of education itself! Productivity x4", 100, 400)
         upgrade9.draw(game_screen)
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
 
 def part_11():
+    """After upgrade 9 is clicked"""
     loop = True
     while loop:
         for event in pygame.event.get():
@@ -667,9 +655,10 @@ def part_11():
         display_message("You bought the United States! Wat? Productivity x8", 100, 400)
         upgrade10.draw(game_screen)
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
 
 def seize():
+    """After upgrade 10 is clicked"""
     loop = True
     while loop:
         for event in pygame.event.get():
@@ -685,12 +674,34 @@ def seize():
         clicker.inc_score_tick()
         prod_button.draw(game_screen)
         display_message("Now you bought the world... Productivity x8", 100, 400)
-        seize_button.clicked()            
+        seize_button.clicked()
+        if seize_button.clicked():
+            loop = False            
         seize_button.draw(game_screen)
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(max_fps)
 
+def final_scene():
+    """Played after seize of production button is clicked"""
+    game_screen.fill(white)
+    red_guy.draw()
+    blueperson.draw()
+    display_message("You are met with a communist", 250, 50)
+    display_message("He gives you the Seize tool and allows you to seize the means of production", 250, 75)
+    display_message("Press SPACEBAR to continue", 250, 125)
+    pygame.display.update()
 
+def end_game():
+    """Played after spacebar is clicked, final scene"""
+    game_screen.fill(white)
+    red_guy.draw()
+    blueperson.draw()
+    display_message("You have successfully seized the means of production.", 250, 50)
+    display_message("You win!", 250, 100)
+    pygame.display.update()
+    clock.tick(max_fps)
+
+# Calling functions, main game logic
 game_intro()
 instructions()
 start_game()
@@ -708,6 +719,25 @@ part_9()
 part_10()
 part_11()
 seize()
+variable_count = 0
+final = False
+while not final:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+            final = True
+    key = pygame.key.get_pressed()
+    if key[pygame.K_SPACE]:
+        variable_count += 1
+    if variable_count == 0:
+        final_scene()
+    if variable_count == 1:
+        end_game()
+        time.sleep(2)
+        final = True
+    clock.tick(max_fps)
+fade_out()
+pygame.mixer.music.fadeout(500)
 pygame.quit()
-
-
+quit()
