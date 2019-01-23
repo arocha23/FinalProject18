@@ -1,9 +1,8 @@
-# Intro to Programming Final Project - Fall 2018
+# Productivity Clicker
+You wake up and you realize you've got midterms this week. The bad news is that you haven't been productive lately! Why not gain some of that productivity by clicking your life away? You could even seize the means of production... It's a clicker game!
+Controls:
+* Just click the button!
 
-* Project details are in description.md
-* Replace the content of this file with your own info about your project before the due date
-* Don't forget to fill out the [Project Proposal Form](https://airtable.com/shrrdA41unoBvi6Ki) before break.
-
-## Setting Up Your Repo
-
-On the GitHub page for this repository, click the "Fork" button. This will create your own copy of this repository, linked to my original. Use the same cloning method we used before to clone the repository to your PythonAnywhere account
+## Relevant Documents
+* [Citations]()
+* [Flowchart]()
